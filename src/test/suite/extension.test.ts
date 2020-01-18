@@ -10,7 +10,7 @@ function activateExtension() {
 	assert.notEqual(extension, undefined);
 
 	return extension!.activate().then(async () => {
-		assert.equal(extension?.isActive, true, "Extension not activated");
+		assert.equal(extension!.isActive, true, "Extension not activated");
 	});
 }
 
