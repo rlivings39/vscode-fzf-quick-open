@@ -54,12 +54,19 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
-		"lint": "tslint -p ./"
+		"lint": "tslint -p ./",
+		"pretest": "npm run compile",
+		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
 		"@types/node": "^6.0.40",
 		"@types/vscode": "^1.33.0",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.6",
+		"glob": "^7.1.4",
+		"mocha": "^6.1.4",
 		"tslint": "^5.16.0",
-		"typescript": "^3.5.1"
+		"typescript": "^3.5.1",
+		"vscode-test": "^1.0.0"
 	}
 }
