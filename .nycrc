@@ -1,0 +1,12 @@
+{
+	"exclude": ["**/test/**", ".vscode-test/**"],
+	"include": ["**/src/*.ts","**/out/*.js"],
+	"extension": [".ts"],
+	"reporter": ["text", "html"],
+	"all": true,
+	"sourceMaps": true,
+	"instrument": true,
+	"hookRequire": true,
+	"hookRunInContext": true,
+	"hookRunInThisContext": true
+}
