@@ -28,12 +28,12 @@ function showFzfTerminal(): vscode.Terminal {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(vscode.commands.registerCommand('terminalTest.runFzfFile', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal();
 		term.sendText('fzf | xargs -r code', true);
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('terminalTest.runFzfAddWorkspaceFolder', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolder', () => {
 		let term = showFzfTerminal();
 		let findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
 		term.sendText(`${findCmd} | fzf | xargs -r code -a`, true);

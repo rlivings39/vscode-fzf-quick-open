@@ -17,18 +17,18 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:terminalTest.runFzfFile",
-		"onCommand:terminalTest.runFzfAddWorkspaceFolder"
+		"onCommand:fzf-quick-open.runFzfFile",
+		"onCommand:fzf-quick-open.runFzfAddWorkspaceFolder"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "terminalTest.runFzfFile",
+				"command": "fzf-quick-open.runFzfFile",
 				"title": "fzf: Open file using fzf"
 			},
 			{
-				"command": "terminalTest.runFzfAddWorkspaceFolder",
+				"command": "fzf-quick-open.runFzfAddWorkspaceFolder",
 				"title": "fzf: Add workspace folder using fzf"
 			}
 		],
