@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
-const TERMINAL_NAME = "fzf terminal";
+export const TERMINAL_NAME = "fzf terminal";
 
 function showFzfTerminal(): vscode.Terminal {
 	if (!fzfTerminal) {
