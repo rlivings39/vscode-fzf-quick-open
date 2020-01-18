@@ -54,7 +54,9 @@ suite('fzf quick open', () => {
 		runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolder', vscode.window.terminals.length+1).then(verifyCommandsRegistered);
 	})
 
-	test('2 commands 1 terminal', () => {
+	test('2 commands 1 terminal', async () => {
+		// Make a test terminal for more coverage
+		await vscode.window.createTerminal("Test terminal");
 		runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfFile', vscode.window.terminals.length+1);
 		// Calling 2nd command should reuse terminal
 		runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolder', vscode.window.terminals.length);

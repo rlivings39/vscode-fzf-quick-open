@@ -1,72 +1,74 @@
 {
-	"name": "fzf-quick-open",
-	"displayName": "fzf quick open",
-	"description": "Open files and folders with fzf",
-	"version": "0.0.3",
-	"author": "Ryan Livingston",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/rlivings39/vscode-fzf-quick-open"
-	},
-	"publisher": "rlivings39",
-	"engines": {
-		"vscode": "^1.33.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:fzf-quick-open.runFzfFile",
-		"onCommand:fzf-quick-open.runFzfAddWorkspaceFolder"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "fzf-quick-open.runFzfFile",
-				"title": "fzf: Open file using fzf"
-			},
-			{
-				"command": "fzf-quick-open.runFzfAddWorkspaceFolder",
-				"title": "fzf: Add workspace folder using fzf"
-			}
-		],
-		"configuration":{
-			"title": "fzf quick open",
-			"properties": {
-				"fzf-quick-open.initialWorkingDirectory": {
-					"scope": "window",
-					"type": "string",
-					"default": "",
-					"description": "Initial working directory for fzf"
-				},
-				"fzf-quick-open.findDirectoriesCmd": {
-					"scope": "window",
-					"type": "string",
-					"default": "find -type d",
-					"description": "Command used to find directories with fzf. For best performance install fd and use 'fd --type d'"
-				}
-			}
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"lint": "tslint -p ./",
-		"pretest": "npm run compile",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/node": "^6.0.40",
-		"@types/vscode": "^1.33.0",
-		"@types/glob": "^7.1.1",
-		"@types/mocha": "^5.2.6",
-		"glob": "^7.1.4",
-		"mocha": "^6.1.4",
-		"tslint": "^5.16.0",
-		"typescript": "^3.5.1",
-		"vscode-test": "^1.0.0"
-	}
+  "name": "fzf-quick-open",
+  "displayName": "fzf quick open",
+  "description": "Open files and folders with fzf",
+  "version": "0.0.3",
+  "author": "Ryan Livingston",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rlivings39/vscode-fzf-quick-open"
+  },
+  "publisher": "rlivings39",
+  "engines": {
+    "vscode": "^1.33.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:fzf-quick-open.runFzfFile",
+    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "fzf-quick-open.runFzfFile",
+        "title": "fzf: Open file using fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfAddWorkspaceFolder",
+        "title": "fzf: Add workspace folder using fzf"
+      }
+    ],
+    "configuration": {
+      "title": "fzf quick open",
+      "properties": {
+        "fzf-quick-open.initialWorkingDirectory": {
+          "scope": "window",
+          "type": "string",
+          "default": "",
+          "description": "Initial working directory for fzf"
+        },
+        "fzf-quick-open.findDirectoriesCmd": {
+          "scope": "window",
+          "type": "string",
+          "default": "find -type d",
+          "description": "Command used to find directories with fzf. For best performance install fd and use 'fd --type d'"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tslint -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js",
+    "coverage": "COVERAGE=1 nyc npm run test"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^6.0.40",
+    "@types/vscode": "^1.33.0",
+    "glob": "^7.1.4",
+    "mocha": "^6.1.4",
+    "nyc": "^15.0.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.5.1",
+    "vscode-test": "^1.0.0"
+  }
 }
