@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
       - xvfb
+      - libsecret-1-0
 
 install:
   - |
