@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf quick open",
   "description": "Open files and folders with fzf",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
@@ -18,7 +18,9 @@
   ],
   "activationEvents": [
     "onCommand:fzf-quick-open.runFzfFile",
-    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder"
+    "onCommand:fzf-quick-open.runFzfFilePwd",
+    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder",
+    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolderPwd"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,8 +30,16 @@
         "title": "fzf: Open file using fzf"
       },
       {
+        "command": "fzf-quick-open.runFzfFilePwd",
+        "title": "fzf: Open file in PWD using fzf"
+      },
+      {
         "command": "fzf-quick-open.runFzfAddWorkspaceFolder",
         "title": "fzf: Add workspace folder using fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfAddWorkspaceFolderPwd",
+        "title": "fzf: Add workspace folder from PWD using fzf"
       }
     ],
     "configuration": {
@@ -60,10 +70,12 @@
     "coverage": "COVERAGE=1 nyc npm run test"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.8",
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.6",
     "@types/node": "^6.0.40",
     "@types/vscode": "^1.33.0",
+    "chai": "^4.2.0",
     "glob": "^7.1.4",
     "mocha": "^6.1.4",
     "nyc": "^15.0.0",

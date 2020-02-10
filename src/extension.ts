@@ -3,12 +3,14 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
+let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 export const TERMINAL_NAME = "fzf terminal";
+export const TERMINAL_NAME_PWD = "fzf pwd terminal";
 
-function showFzfTerminal(): vscode.Terminal {
+function showFzfTerminal(name: string, fzfTerminal: vscode.Terminal | undefined): vscode.Terminal {
 	if (!fzfTerminal) {
 		// Look for an existing terminal
-		fzfTerminal = vscode.window.terminals.find((term) => { return term.name === TERMINAL_NAME; });
+		fzfTerminal = vscode.window.terminals.find((term) => { return term.name === name; });
 	}
 	if (!fzfTerminal) {
 		// Create an fzf terminal
@@ -20,69 +22,54 @@ function showFzfTerminal(): vscode.Terminal {
 		cwd = cwd || '';
 		fzfTerminal = vscode.window.createTerminal({
 			cwd: cwd,
-			name: TERMINAL_NAME
+			name: name
 		});
 	}
 	fzfTerminal.show();
 	return fzfTerminal;
 }
 
+function moveToPwd(term: vscode.Terminal) {
+	if (vscode.window.activeTextEditor) {
+		let cwd = path.dirname(vscode.window.activeTextEditor.document.fileName);
+		term.sendText(`cd ${cwd}`);
+	}
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
-		let term = showFzfTerminal();
+		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		term.sendText('fzf | xargs -r code', true);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFilePwd', () => {
+		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		moveToPwd(term);
 		term.sendText('fzf | xargs -r code', true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolder', () => {
-		let term = showFzfTerminal();
+		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
 		let findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
 		term.sendText(`${findCmd} | fzf | xargs -r code -a`, true);
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolderPwd', () => {
+		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		let findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
+		moveToPwd(term);
+		term.sendText(`${findCmd} | fzf | xargs -r code -a`, true);
+	}));
+
 	vscode.window.onDidCloseTerminal((terminal) => {
-		if (terminal.name === TERMINAL_NAME) {
-			fzfTerminal = undefined;
+		switch (terminal.name) {
+			case TERMINAL_NAME:
+				fzfTerminal = undefined;
+				break;
+
+			case TERMINAL_NAME_PWD:
+				fzfTerminalPwd = undefined
+				break;
 		}
 	});
-}
-
-function colorText(text: string): string {
-	let output = '';
-	let colorIndex = 1;
-	for (let i = 0; i < text.length; i++) {
-		const char = text.charAt(i);
-		if (char === ' ' || char === '\r' || char === '\n') {
-			output += char;
-		} else {
-			output += `\x1b[3${colorIndex++}m${text.charAt(i)}\x1b[0m`;
-			if (colorIndex > 6) {
-				colorIndex = 1;
-			}
-		}
-	}
-	return output;
-}
-
-function selectTerminal(): Thenable<vscode.Terminal | undefined> {
-	interface TerminalQuickPickItem extends vscode.QuickPickItem {
-		terminal: vscode.Terminal;
-	}
-	const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
-	const items: TerminalQuickPickItem[] = terminals.map(t => {
-		return {
-			label: `name: ${t.name}`,
-			terminal: t
-		};
-	});
-	return vscode.window.showQuickPick(items).then(item => {
-		return item ? item.terminal : undefined;
-	});
-}
-
-function ensureTerminalExists(): boolean {
-	if ((<any>vscode.window).terminals.length === 0) {
-		vscode.window.showErrorMessage('No active terminals');
-		return false;
-	}
-	return true;
 }
