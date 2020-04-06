@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.0.7] - 2020-04-06
+
+### Changed
+
+- Upgrade some package dependencies
+
 ## [0.0.6] - 2020-02-09
 
 ### Added
