@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf quick open",
   "description": "Open files and folders with fzf",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
@@ -56,6 +56,12 @@
           "type": "string",
           "default": "find -type d",
           "description": "Command used to find directories with fzf. For best performance install fd and use 'fd --type d'"
+        },
+        "fzf-quick-open.codeCmd": {
+          "scope": "window",
+          "type": "string",
+          "default": "code",
+          "description": "Command used to launch VSCode. Set to code-insiders if using insiders build"
         }
       }
     }
@@ -73,7 +79,7 @@
     "@types/chai": "^4.2.8",
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^6.0.40",
+    "@types/node": "^6.14.10",
     "@types/vscode": "^1.33.0",
     "chai": "^4.2.0",
     "glob": "^7.1.4",
@@ -81,7 +87,7 @@
     "mocha": "^6.1.4",
     "nyc": "^15.0.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.5.1",
+    "typescript": "^3.8.3",
     "vscode-test": "^1.0.0"
   }
 }

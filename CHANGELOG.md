@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.0.8] - 2020-04-16
+
+### Added
+
+- Setting `fzf-quick-open.codeCmd` to override the command used to launch `code`. Useful if you use `code-insiders`.
+
 ## [0.0.7] - 2020-04-06
 
 ### Changed

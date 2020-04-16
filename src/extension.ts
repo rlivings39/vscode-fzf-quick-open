@@ -37,28 +37,31 @@ function moveToPwd(term: vscode.Terminal) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	let codeCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('codeCmd') as string ?? "code";
+	let codeOpenFileCmd = `fzf | xargs -r ${codeCmd}`;
+	let codeOpenFolderCmd = `fzf | xargs -r ${codeCmd} -a`;
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		term.sendText('fzf | xargs -r code', true);
+		term.sendText(codeOpenFileCmd, true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFilePwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		moveToPwd(term);
-		term.sendText('fzf | xargs -r code', true);
+		term.sendText(codeOpenFileCmd, true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolder', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
 		let findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
-		term.sendText(`${findCmd} | fzf | xargs -r code -a`, true);
+		term.sendText(`${findCmd} | ${codeOpenFolderCmd}`, true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolderPwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		let findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
 		moveToPwd(term);
-		term.sendText(`${findCmd} | fzf | xargs -r code -a`, true);
+		term.sendText(`${findCmd} | ${codeOpenFolderCmd}`, true);
 	}));
 
 	vscode.window.onDidCloseTerminal((terminal) => {
