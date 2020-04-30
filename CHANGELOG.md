@@ -6,7 +6,7 @@
 
 ### Added
 
-- Windows support by using null-terminated strings from `fzf` and `xargs`. Thanks to @NgrNxk for the fix!
+- Windows support by using null-terminated strings from `fzf` and `xargs`. Thanks to [NgrNxk](https://github.com/NgrNxk) for the fix!
 
 ## [0.0.8] - 2020-04-16
 
