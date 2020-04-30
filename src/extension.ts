@@ -38,8 +38,8 @@ function moveToPwd(term: vscode.Terminal) {
 
 export function activate(context: vscode.ExtensionContext) {
 	let codeCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('codeCmd') as string ?? "code";
-	let codeOpenFileCmd = `fzf | xargs -r ${codeCmd}`;
-	let codeOpenFolderCmd = `fzf | xargs -r ${codeCmd} -a`;
+	let codeOpenFileCmd = `fzf --print0 | xargs -0 -r ${codeCmd}`;
+	let codeOpenFolderCmd = `fzf --print0 | xargs -0 -r ${codeCmd} -a`;
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
 		term.sendText(codeOpenFileCmd, true);
