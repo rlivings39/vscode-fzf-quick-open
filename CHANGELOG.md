@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.1.0] - 2020-04-30
+
+### Added
+
+- Windows support by using null-terminated strings from `fzf` and `xargs`. Thanks to @NgrNxk for the fix!
+
 ## [0.0.8] - 2020-04-16
 
 ### Added
