@@ -70,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -0 -r -I {} code -g {}`;
+		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -r -I {} code -g {}`;
 		term.sendText(searchCmd, true);
 	}));
 
@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
-		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -0 -r -I {} code -g {}`;
+		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -r -I {} code -g {}`;
 		moveToPwd(term);
 		term.sendText(searchCmd, true);
 	}));
