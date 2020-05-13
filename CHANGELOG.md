@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-05-13
+
+### Added
+
+- Searching commands which search using fzf and ripgrep: `fzf-quick-open.runFzfSearch, fzf-quick-open.runFzfSearchPwd`
+
 ## [0.1.0] - 2020-04-30
 
 ### Added

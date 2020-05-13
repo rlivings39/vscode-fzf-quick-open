@@ -11,11 +11,13 @@ Provides the commands:
 
 * `fzf: Open file using fzf` opens a terminal in which you can choose a file
 * `fzf: Add workspace folder using fzf` to add a workspace folder
+* `fzf: Search using rg and fzf` to search using `fzf` and `ripgrep`
 
 On terminal launch, the `pwd` is chosen based on the active editor file. Also adds
 
 * `fzf: Open file in PWD using fzf`
 * `fzf: Add workspace folder from PWD using fzf`
+* `fzf: Search in PWD using rg and fzf`
 
 which are the same as above but switches to parent directory of active file on every invocation.
 
@@ -26,6 +28,7 @@ Change the setting `fzf-quick-open.initialWorkingDirectory` to override the init
 # Setup
 
 1. [Install fzf](https://github.com/junegunn/fzf)
+1. [Install ripgrep](https://github.com/BurntSushi/ripgrep)
 1. For best performance you should set up `fzf` to use the amazingly fast [fd](https://github.com/sharkdp/fd)
 
     **`~/.config/fish/config.fish`**

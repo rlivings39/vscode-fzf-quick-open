@@ -20,7 +20,9 @@
     "onCommand:fzf-quick-open.runFzfFile",
     "onCommand:fzf-quick-open.runFzfFilePwd",
     "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder",
-    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolderPwd"
+    "onCommand:fzf-quick-open.runFzfAddWorkspaceFolderPwd",
+    "onCommand:fzf-quick-open.runFzfSearch",
+    "onCommand:fzf-quick-open.runFzfSearchPwd"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -40,6 +42,14 @@
       {
         "command": "fzf-quick-open.runFzfAddWorkspaceFolderPwd",
         "title": "fzf: Add workspace folder from PWD using fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfSearch",
+        "title": "fzf: Search using rg and fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfSearchPwd",
+        "title": "fzf: Search in PWD using rg and fzf"
       }
     ],
     "configuration": {

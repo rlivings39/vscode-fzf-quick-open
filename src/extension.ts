@@ -64,6 +64,27 @@ export function activate(context: vscode.ExtensionContext) {
 		term.sendText(`${findCmd} | ${codeOpenFolderCmd}`, true);
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearch', async () => {
+		let pattern = await getSearchText();
+		if (pattern === undefined) {
+			return;
+		}
+		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -0 -r -I {} code -g {}`;
+		term.sendText(searchCmd, true);
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearchPwd', async () => {
+		let pattern = await getSearchText();
+		if (pattern === undefined) {
+			return;
+		}
+		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -0 -r -I {} code -g {}`;
+		moveToPwd(term);
+		term.sendText(searchCmd, true);
+	}));
+
 	vscode.window.onDidCloseTerminal((terminal) => {
 		switch (terminal.name) {
 			case TERMINAL_NAME:
@@ -75,4 +96,11 @@ export function activate(context: vscode.ExtensionContext) {
 				break;
 		}
 	});
+}
+
+async function getSearchText(): Promise<string | undefined> {
+	let pattern = await vscode.window.showInputBox({
+		prompt: "Search pattern"
+	});
+	return pattern;
 }

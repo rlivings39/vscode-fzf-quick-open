@@ -22,6 +22,8 @@ async function verifyCommandsRegistered() {
 	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfFilePwd'), -1);
 	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder'), -1);
 	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd'), -1);
+	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfSSearch'), -1);
+	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfSearchPwd'), -1);
 }
 
 async function runCommandAndVerifyFzfTerminal(cmd: string, numterms: number, activeTerminalName: string) {
@@ -42,6 +44,8 @@ suite('fzf quick open', () => {
 		assert.equal(cmds.indexOf('fzf-quick-open.runFzfFilePwd'), -1);
 		assert.equal(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder'), -1);
 		assert.equal(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd'), -1);
+		assert.equal(cmds.indexOf('fzf-quick-open.runFzfSSearch'), -1);
+		assert.equal(cmds.indexOf('fzf-quick-open.runFzfSearchPwd'), -1);
 	});
 
 	test('Load extension', () => {
