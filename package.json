@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf quick open",
   "description": "Open files and folders with fzf",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
