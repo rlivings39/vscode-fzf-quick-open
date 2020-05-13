@@ -70,8 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -r -I {} code -g {}`;
-		term.sendText(searchCmd, true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearchPwd', async () => {
@@ -80,9 +79,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
-		let searchCmd = `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -d : -f 1-3 | xargs -r -I {} code -g {}`;
 		moveToPwd(term);
-		term.sendText(searchCmd, true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	vscode.window.onDidCloseTerminal((terminal) => {
@@ -103,4 +101,8 @@ async function getSearchText(): Promise<string | undefined> {
 		prompt: "Search pattern"
 	});
 	return pattern;
+}
+
+function makeSearchCmd(pattern: string): string {
+	return `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -z -d : -f 1-3 | xargs -0 -r code -g`;
 }
