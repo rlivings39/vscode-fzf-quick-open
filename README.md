@@ -6,6 +6,8 @@
 # Basic integration of fzf into vscode to open files and folders
 Any time that vscode requires interaction with the OS file dialog, the workflow can become much less efficient. This comes up when opening files outside of your workspace folders or adding a workspace folder. This extension solves that by providing these actions using [fzf](https://github.com/junegunn/fzf).
 
+Works on *nix, Mac, and Windows using Git Bash as your shell in VSCode. The extension relies on calling `xargs` and `cut` in the terminal window.
+
 # Usage
 Provides the commands:
 
