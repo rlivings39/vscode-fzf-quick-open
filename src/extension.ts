@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { systemDefaultPlatform } from 'vscode-test/out/util';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 export const TERMINAL_NAME = "fzf terminal";
@@ -36,10 +37,18 @@ function moveToPwd(term: vscode.Terminal) {
 	}
 }
 
+function xargsCmd() {
+	if (process.platform === 'darwin') {
+		return 'xargs -0';
+	} else {
+		return 'xargs -0 -r';
+	}
+
+}
 export function activate(context: vscode.ExtensionContext) {
 	let codeCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('codeCmd') as string ?? "code";
-	let codeOpenFileCmd = `fzf --print0 | xargs -0 -r ${codeCmd}`;
-	let codeOpenFolderCmd = `fzf --print0 | xargs -0 -r ${codeCmd} -a`;
+	let codeOpenFileCmd = `fzf --print0 | ${xargsCmd()} ${codeCmd}`;
+	let codeOpenFolderCmd = `fzf --print0 | ${xargsCmd()} ${codeCmd} -a`;
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
 		term.sendText(codeOpenFileCmd, true);
@@ -104,5 +113,5 @@ async function getSearchText(): Promise<string | undefined> {
 }
 
 function makeSearchCmd(pattern: string, codeCmd: string): string {
-	return `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -z -d : -f 1-3 | xargs -0 -r ${codeCmd} -g`;
+	return `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -z -d : -f 1-3 | ${xargsCmd()} ${codeCmd} -g`;
 }
