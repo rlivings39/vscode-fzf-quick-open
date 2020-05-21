@@ -49,7 +49,10 @@ Change the setting `fzf-quick-open.initialWorkingDirectory` to override the init
 
 # Examples
 **Open file**
-![](resources/fzfVscodeOpenFile.gif)
+![Open file with fzf](resources/fzfVscodeOpenFile.gif)
 
 **Open workspace folder**
-![](resources/fzfVscodeOpenFolder.gif)
+![Add workspace folder with fzf](resources/fzfVscodeOpenFolder.gif)
+
+**Open workspace folder**
+![Search with rg and fzf](resources/fzfVscodeRg.gif)
