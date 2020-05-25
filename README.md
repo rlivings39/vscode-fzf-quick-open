@@ -3,23 +3,25 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open)
 [![Rating](https://vsmarketplacebadge.apphb.com/rating-short/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open&ssr=false#review-details)
 
-# Basic integration of fzf into vscode to open files and folders
+# fzf-based fuzzy searching in VScode to open files/folders and filter ripgrep results
 Any time that vscode requires interaction with the OS file dialog, the workflow can become much less efficient. This comes up when opening files outside of your workspace folders or adding a workspace folder. This extension solves that by providing these actions using [fzf](https://github.com/junegunn/fzf).
 
-Works on *nix, Mac, and Windows using Git Bash as your shell in VSCode. The extension relies on calling `xargs` and `cut` in the terminal window.
+Provides an interface to search using `ripgrep` and browse the results using `fzf`. This is inspired by Vim's `rg` and `fzf` integration. The search pattern defaults to the word under your cursor or your current selection and is easily overridden.
+
+Works on *nix, Mac, and Windows with Git Bash as your shell in VSCode. The extension relies on calling `xargs` and `cut` in the terminal window.
 
 # Usage
 Provides the commands:
 
+* `fzf: Search using rg and fzf` to search using `fzf` and `ripgrep`
 * `fzf: Open file using fzf` opens a terminal in which you can choose a file
 * `fzf: Add workspace folder using fzf` to add a workspace folder
-* `fzf: Search using rg and fzf` to search using `fzf` and `ripgrep`
 
 On terminal launch, the `pwd` is chosen based on the active editor file. Also adds
 
+* `fzf: Search in PWD using rg and fzf`
 * `fzf: Open file in PWD using fzf`
 * `fzf: Add workspace folder from PWD using fzf`
-* `fzf: Search in PWD using rg and fzf`
 
 which are the same as above but switches to parent directory of active file on every invocation.
 
@@ -48,11 +50,12 @@ Change the setting `fzf-quick-open.initialWorkingDirectory` to override the init
 1. Configure the setting `fzf-quick-open.findDirectoriesCmd` to use `fd`: `fd --type d`
 
 # Examples
+**Search with ripgrep**
+![Search with rg and fzf](resources/fzfVscodeRg.gif)
+
 **Open file**
 ![Open file with fzf](resources/fzfVscodeOpenFile.gif)
 
 **Open workspace folder**
 ![Add workspace folder with fzf](resources/fzfVscodeOpenFolder.gif)
 
-**Open workspace folder**
-![Search with rg and fzf](resources/fzfVscodeRg.gif)
