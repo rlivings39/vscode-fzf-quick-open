@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.10] - 2020-05-24
+
+### Changed
+
+- `rg` search string is pre-filled based on selection/cursor postion as requested in #11.
+
 ## [0.2.0] - 2020-05-13
 
 ### Added
