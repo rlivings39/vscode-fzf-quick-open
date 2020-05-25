@@ -72,6 +72,12 @@
           "type": "string",
           "default": "code",
           "description": "Command used to launch VSCode. Set to code-insiders if using insiders build"
+        },
+        "fzf-quick-open.fuzzyCmd": {
+          "scope": "window",
+          "type": "string",
+          "default": "fzf",
+          "description": "Command used for fuzzy searching program. E.g. fzf, sk"
         }
       }
     }
