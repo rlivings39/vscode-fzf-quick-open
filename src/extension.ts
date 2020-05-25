@@ -106,12 +106,27 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 async function getSearchText(): Promise<string | undefined> {
+	let activeSelection = vscode.window.activeTextEditor?.selection;
+	let value: string | undefined = undefined;
+
+	if (activeSelection) {
+		let activeRange: vscode.Range | undefined;
+		if (activeSelection.isEmpty) {
+			activeRange = vscode.window.activeTextEditor?.document.getWordRangeAtPosition(activeSelection.active);
+		} else {
+			activeRange = activeSelection;
+		}
+		value = activeRange ? vscode.window.activeTextEditor?.document.getText(activeRange) : undefined
+	}
+
 	let pattern = await vscode.window.showInputBox({
-		prompt: "Search pattern"
+		prompt: "Search pattern",
+		value: value
 	});
 	return pattern;
 }
 
 function makeSearchCmd(pattern: string, codeCmd: string): string {
-	return `rg ${pattern} --vimgrep --color ansi | fzf --ansi --print0 | cut -z -d : -f 1-3 | ${xargsCmd()} ${codeCmd} -g`;
+	pattern = pattern.replace("'", "\\'");
+	return `rg '${pattern}' --vimgrep --color ansi | fzf --ansi --print0 | cut -z -d : -f 1-3 | ${xargsCmd()} ${codeCmd} -g`;
 }
