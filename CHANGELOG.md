@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.11] - 2020-05-25
+
+### Changed
+
+- Added setting `fzf-quick-open.fuzzyCmd` to allow using a fuzzy matcher other than `fzf`. E.g. skim (`sk`).
+
 ## [0.2.10] - 2020-05-24
 
 ### Changed

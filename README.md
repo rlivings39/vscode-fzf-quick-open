@@ -27,7 +27,11 @@ which are the same as above but switches to parent directory of active file on e
 
 Bind the commands to keyboard shortcuts to launch faster.
 
+## Configuration
+
 Change the setting `fzf-quick-open.initialWorkingDirectory` to override the initial working directory used for the fzf terminal. Change `fzf-quick-open.findDirectoriesCmd` to change the command used to find directories. Something like `fd --type d` is very fast if you use [fd](https://github.com/sharkdp/fd).
+
+By default `fzf` is used as the fuzzy matcher command. To change this to add flags or use another tool like skim (`sk`) modify the setting `fzf-quick-open.fuzzyCmd` to be the command that should be run. It will be plugged in to a context like: `rg searchTerm | fzf --ansi --print0 ...` and needs to support `--ansi --print0` flags.
 
 # Setup
 
