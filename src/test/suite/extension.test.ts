@@ -1,84 +1,100 @@
-import * as assert from 'assert';
-
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
+import * as vstest from 'vscode-test';
 import * as fzfQuickOpen from '../../extension'
 import {suite} from 'mocha';
 import {expect} from 'chai';
 
-function activateExtension() {
+async function activateExtension() {
 	let extension = vscode.extensions.getExtension('rlivings39.fzf-quick-open');
-	assert.notEqual(extension, undefined);
-
-	return extension!.activate().then(async () => {
-		assert.equal(extension!.isActive, true, "Extension not activated");
-	});
+	expect(extension).not.eq(undefined);
+	let res = await extension!.activate();
+	expect(extension!.isActive, "Extension not activated").eq(true);
+	return res;
 }
 
 async function verifyCommandsRegistered() {
 	let cmds: string[] = await vscode.commands.getCommands();
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfFile'), -1);
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfFilePwd'), -1);
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder'), -1);
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd'), -1);
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfSSearch'), -1);
-	assert.notEqual(cmds.indexOf('fzf-quick-open.runFzfSearchPwd'), -1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfFile')).not.eq(-1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfFilePwd')).not.eq(-1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder')).not.eq(-1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd')).not.eq(-1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfSearch')).not.eq(-1);
+	expect(cmds.indexOf('fzf-quick-open.runFzfSearchPwd')).not.eq(-1);
 }
 
 async function runCommandAndVerifyFzfTerminal(cmd: string, numterms: number, activeTerminalName: string) {
 	await vscode.commands.executeCommand(cmd);
-	assert.equal(vscode.window.terminals.length, numterms, "Didn't find new terminal");
+	expect(vscode.window.terminals.length, "Didn't find new terminal").eq(numterms);
 	let fzfTermIdx = vscode.window.terminals.findIndex((term) => {
 		return term.name === activeTerminalName;
 	});
 	expect(fzfTermIdx).gte(0, `Didn't find terminal ${activeTerminalName}`);
 }
 
-suite('fzf quick open', () => {
+suite('fzf quick open uninit', async () => {
 	vscode.window.showInformationMessage('Start all tests.');
-	test('Commands not registered', async () => {
+	test('Commands not registered', () => {
 		// Commands not yet present
-		let cmds: string[] = await vscode.commands.getCommands();
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfFile'), -1);
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfFilePwd'), -1);
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder'), -1);
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd'), -1);
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfSSearch'), -1);
-		assert.equal(cmds.indexOf('fzf-quick-open.runFzfSearchPwd'), -1);
+		vscode.commands.getCommands().then((cmds) => {
+		expect(cmds.indexOf('fzf-quick-open.runFzfFile')).eq(-1);
+		expect(cmds.indexOf('fzf-quick-open.runFzfFilePwd')).eq(-1);
+		expect(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolder')).eq(-1);
+		expect(cmds.indexOf('fzf-quick-open.runFzfAddWorkspaceFolderPwd')).eq(-1);
+		expect(cmds.indexOf('fzf-quick-open.runFzfSSearch')).eq(-1);
+		expect(cmds.indexOf('fzf-quick-open.runFzfSearchPwd')).eq(-1);
+		})
 	});
 
-	test('Load extension', () => {
-		activateExtension().then(() => {
-			verifyCommandsRegistered();
-		})
+	//activateExtension();
+
+	test('Load extension', async () => {
+		await activateExtension();
+		await verifyCommandsRegistered();
 	});
 
 	test('Open file', async () => {
 		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfFile', vscode.window.terminals.length + 1, fzfQuickOpen.TERMINAL_NAME);
-		verifyCommandsRegistered();
+		await verifyCommandsRegistered();
 	})
 
 	test('Add workspace folder', async () => {
 		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolder', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME)
-		verifyCommandsRegistered();
+		await verifyCommandsRegistered();
 	})
 
 	test('2 commands 1 terminal', async () => {
 		// Make a test terminal for more coverage
 		await vscode.window.createTerminal("Test terminal");
-		runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfFile', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME);
+		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfFile', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME);
 		// Calling 2nd command should reuse terminal
-		runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolder', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME);
+		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolder', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME);
 	});
 
 	test('Open file pwd', async () => {
 		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfFilePwd', vscode.window.terminals.length + 1, fzfQuickOpen.TERMINAL_NAME_PWD)
-		verifyCommandsRegistered();
+		await verifyCommandsRegistered();
 	})
 
 	test('Add workspace folder pwd', async () => {
 		await runCommandAndVerifyFzfTerminal('fzf-quick-open.runFzfAddWorkspaceFolderPwd', vscode.window.terminals.length, fzfQuickOpen.TERMINAL_NAME_PWD)
-		verifyCommandsRegistered();
+		await verifyCommandsRegistered();
+	})
+
+	async function verifyRgConfig(opt: fzfQuickOpen.rgoptions, flag: string) {
+		let settings = vscode.workspace.getConfiguration('fzf-quick-open');
+		await settings.update('ripgrepSearchStyle', opt, vscode.ConfigurationTarget.Global);
+		let rgcmd = fzfQuickOpen.makeSearchCmd('pattern','code');
+		let expectedFlag = fzfQuickOpen.rgflagmap.get(opt);
+		expect(rgcmd).contains(expectedFlag);
+		expect(rgcmd).contains(flag);
+	}
+
+	// Make sure we respond to configuration changes when computing rg command
+	test('Rg configuration', async () => {
+		await verifyRgConfig(fzfQuickOpen.rgoptions.CaseSensitive, "--case-sensitive")
+		await verifyRgConfig(fzfQuickOpen.rgoptions.IgnoreCase, "--ignore-case");
+		await verifyRgConfig(fzfQuickOpen.rgoptions.SmartCase, "--smart-case");
 	})
 });

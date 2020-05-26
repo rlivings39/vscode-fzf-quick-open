@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.2.12] - 2020-05-26
+
+### Added
+
+- Added setting `fzf-quick-open.ripgrepSearchStyle` to modify the `rg` case matching behavior between case sensitive, ignore case, and smart case.
+
 ## [0.2.11] - 2020-05-25
 
 ### Changed

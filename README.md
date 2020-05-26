@@ -33,6 +33,12 @@ Change the setting `fzf-quick-open.initialWorkingDirectory` to override the init
 
 By default `fzf` is used as the fuzzy matcher command. To change this to add flags or use another tool like skim (`sk`) modify the setting `fzf-quick-open.fuzzyCmd` to be the command that should be run. It will be plugged in to a context like: `rg searchTerm | fzf --ansi --print0 ...` and needs to support `--ansi --print0` flags.
 
+To change the `rg` case matching options use the setting `fzf-quick-open.ripgrepSearchStyle` to choose between:
+
+* Case sensitive
+* Ignore case
+* Smart case
+
 # Setup
 
 1. [Install fzf](https://github.com/junegunn/fzf)

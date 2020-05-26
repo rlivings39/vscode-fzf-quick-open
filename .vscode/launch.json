@@ -22,10 +22,11 @@
 			"name": "Run Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"runtimeExecutable": "${execPath}",
+            "runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+                "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+                "--user-data-dir=${workspaceFolder}/out/test/dataDir"
 			],
 			"outFiles": ["${workspaceFolder}/out/test/**/*.js"],
 			"preLaunchTask": "npm: watch"
