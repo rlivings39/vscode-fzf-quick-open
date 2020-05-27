@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
 ## [0.2.12] - 2020-05-26
 
 ### Added
