@@ -10,7 +10,6 @@ let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
 let codeCmd: string;
 let codePath: string;
-let codeCmdVar = 'QUICK_OPEN_CODE_CMD';
 let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
@@ -45,10 +44,7 @@ function showFzfTerminal(name: string, fzfTerminal: vscode.Terminal | undefined)
 		initialCwd = initialCwd || '';
 		fzfTerminal = vscode.window.createTerminal({
 			cwd: initialCwd,
-			name: name,
-			env: {
-				[codeCmdVar]: codePath
-			}
+			name: name
 		});
 	}
 	fzfTerminal.show();
@@ -95,7 +91,7 @@ function setupCodeCmd() {
 	} else if (fs.existsSync(remotePath)) {
 		codePath = path.join(remotePath, codePath);
 	}
-	codeCmd = isWindows() ? `%${codeCmdVar}%` : `$${codeCmdVar}`;
+	codeCmd = `"${codePath}"`;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -190,6 +186,5 @@ async function getSearchText(): Promise<string | undefined> {
  * @param codeCmd Command used to launch code
  */
 export function makeSearchCmd(pattern: string, codeCmd: string): string {
-	pattern = pattern.replace("'", "\\'");
 	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi --print0 | cut -z -d : -f 1-3 | ${xargsCmd()} ${codeCmd} -g`;
 }
