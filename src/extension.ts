@@ -3,8 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { systemDefaultPlatform } from 'vscode-test/out/util';
-import { fstat } from 'fs';
+import * as net from 'net';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
@@ -14,10 +13,11 @@ let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
 let rgCaseFlag: string;
+let fzfPipe: string;
+let fzfPipeBatch: string;
 
 export const TERMINAL_NAME = "fzf terminal";
 export const TERMINAL_NAME_PWD = "fzf pwd terminal";
-
 
 export enum rgoptions {
 	CaseSensitive = "Case sensitive",
@@ -25,7 +25,7 @@ export enum rgoptions {
 	SmartCase = "Smart case"
 }
 
-export const rgflagmap = new Map<string, string> ([
+export const rgflagmap = new Map<string, string>([
 	[rgoptions.CaseSensitive, "--case-sensitive"],
 	[rgoptions.IgnoreCase, "--ignore-case"],
 	[rgoptions.SmartCase, "--smart-case"]
@@ -94,16 +94,82 @@ function setupCodeCmd() {
 	codeCmd = `"${codePath}"`;
 }
 
+function getPath(arg: string, pwd: string): string | undefined {
+	if (!path.isAbsolute(arg)) {
+		arg = path.join(pwd, arg);
+	}
+	if (fs.existsSync(arg)) {
+		return arg;
+	} else {
+		return undefined;
+	}
+}
+
+function escapeWinPath(origPath: string) {
+	return origPath.replace(/\\/g,'\\\\');
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	applyConfig();
+	if (isWindows()) {
+		let server = net.createServer((socket) => {
+			socket.on('data', (data) => {
+				let [cmd, pwd, arg] = data.toString().trim().split('$$');
+				cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
+				if (arg === "") { return }
+				if (cmd === 'open') {
+					let filename = getPath(arg, pwd);
+					if (!filename) { return }
+					vscode.window.showTextDocument(vscode.Uri.file(filename));
+				} else if (cmd === 'add') {
+					let folder = getPath(arg, pwd);
+					if (!folder) { return }
+					vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, {
+						uri: vscode.Uri.file(folder)
+					});
+					vscode.commands.executeCommand('workbench.view.explorer');
+				} else if (cmd === 'rg') {
+					let [file, linestr, colstr] = arg.split(':');
+					let filename = getPath(file, pwd);
+					if (!filename) { return };
+					let line = parseInt(linestr)-1;
+					let col = parseInt(colstr)-1;
+					vscode.window.showTextDocument(vscode.Uri.file(filename)).then((ed) => {
+						ed.selection = new vscode.Selection(line, col, line, col);
+					})
+				}
+			})
+
+		});
+		let idx = 0;
+		while (!fzfPipe) {
+			try {
+				let pipe = `\\\\?\\pipe\\fzf-pipe-${process.pid}`;
+				if (idx > 0) { pipe += `-${idx}`; }
+				server.listen(pipe);
+				fzfPipe = escapeWinPath(pipe);
+			} catch(e) {
+				if (e.code === 'EADDRINUSE') {
+					// Try again for a new address
+					++idx;
+				} else {
+					// Bad news
+					throw e;
+				}
+			}
+		}
+		fzfPipeBatch = vscode.extensions.getExtension('rlivings39.fzf-quick-open')?.extensionPath ?? "";
+		fzfPipeBatch = escapeWinPath(path.join(fzfPipeBatch, 'scripts', 'topipe.bat'));
+	}
 	setupCodeCmd();
 	vscode.workspace.onDidChangeConfiguration((e) => {
 		if (e.affectsConfiguration('fzf-quick-open')) {
 			applyConfig();
 		}
 	})
-	let codeOpenFileCmd = `${fzfCmd} --print0 | ${xargsCmd()} ${codeCmd}`;
-	let codeOpenFolderCmd = `${fzfCmd} --print0 | ${xargsCmd()} ${codeCmd} -a`;
+
+	let codeOpenFileCmd = `${fzfCmd} | ${fzfPipeBatch} open ${fzfPipe}`;
+	let codeOpenFolderCmd = `${fzfCmd} | ${fzfPipeBatch} add ${fzfPipe}`;
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
@@ -186,5 +252,5 @@ async function getSearchText(): Promise<string | undefined> {
  * @param codeCmd Command used to launch code
  */
 export function makeSearchCmd(pattern: string, codeCmd: string): string {
-	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi --print0 | cut -z -d : -f 1-3 | ${xargsCmd()} ${codeCmd} -g`;
+	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi | ${fzfPipeBatch} rg ${fzfPipe}`;
 }
