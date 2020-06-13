@@ -2,11 +2,15 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 import { systemDefaultPlatform } from 'vscode-test/out/util';
+import { fstat } from 'fs';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
 let codeCmd: string;
+let codePath: string;
+let codeCmdVar = 'QUICK_OPEN_CODE_CMD';
 let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
@@ -41,7 +45,10 @@ function showFzfTerminal(name: string, fzfTerminal: vscode.Terminal | undefined)
 		initialCwd = initialCwd || '';
 		fzfTerminal = vscode.window.createTerminal({
 			cwd: initialCwd,
-			name: name
+			name: name,
+			env: {
+				[codeCmdVar]: codePath
+			}
 		});
 	}
 	fzfTerminal.show();
@@ -65,7 +72,6 @@ function xargsCmd() {
 }
 
 function applyConfig() {
-	codeCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('codeCmd') as string ?? "code";
 	fzfCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('fuzzyCmd') as string ?? "fzf";
 	findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
 	initialCwd = vscode.workspace.getConfiguration('fzf-quick-open').get('initialWorkingDirectory') as string;
@@ -73,8 +79,28 @@ function applyConfig() {
 	rgCaseFlag = rgflagmap.get(rgopt) ?? "Case sensitive";
 }
 
+function isWindows() {
+	return process.platform === 'win32';
+}
+
+function setupCodeCmd() {
+	codePath = vscode.env.appName.toLowerCase().indexOf('insiders') !== -1 ? 'code-insiders' : 'code';
+	// Go find the code executable if we can. This adds stability for when the user's shell
+	// doesn't have the right code on the top of the path
+	let binRoot = vscode.env.appRoot;
+	let localPath = path.join(binRoot, '..', '..', 'bin');
+	let remotePath = path.join(binRoot, 'bin');
+	if (fs.existsSync(localPath)) {
+		codePath = path.join(localPath, codePath);
+	} else if (fs.existsSync(remotePath)) {
+		codePath = path.join(remotePath, codePath);
+	}
+	codeCmd = isWindows() ? `%${codeCmdVar}%` : `$${codeCmdVar}`;
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	applyConfig();
+	setupCodeCmd();
 	vscode.workspace.onDidChangeConfiguration((e) => {
 		if (e.affectsConfiguration('fzf-quick-open')) {
 			applyConfig();
