@@ -118,7 +118,9 @@ function processCommandInput(data: Buffer) {
 		let line = parseInt(linestr) - 1;
 		let col = parseInt(colstr) - 1;
 		vscode.window.showTextDocument(vscode.Uri.file(filename)).then((ed) => {
-			ed.selection = new vscode.Selection(line, col, line, col);
+			let start = new vscode.Position(line, col);
+			ed.selection = new vscode.Selection(start, start);
+			ed.revealRange(new vscode.Range(start, start));
 		})
 	}
 }
