@@ -4,17 +4,19 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as net from 'net';
+import * as os from 'os';
+import * as cp from 'child_process';
+
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
-let codeCmd: string;
 let codePath: string;
 let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
 let rgCaseFlag: string;
 let fzfPipe: string;
-let fzfPipeBatch: string;
+let fzfPipeScript: string;
 
 export const TERMINAL_NAME = "fzf terminal";
 export const TERMINAL_NAME_PWD = "fzf pwd terminal";
@@ -79,21 +81,6 @@ function isWindows() {
 	return process.platform === 'win32';
 }
 
-function setupCodeCmd() {
-	codePath = vscode.env.appName.toLowerCase().indexOf('insiders') !== -1 ? 'code-insiders' : 'code';
-	// Go find the code executable if we can. This adds stability for when the user's shell
-	// doesn't have the right code on the top of the path
-	let binRoot = vscode.env.appRoot;
-	let localPath = path.join(binRoot, '..', '..', 'bin');
-	let remotePath = path.join(binRoot, 'bin');
-	if (fs.existsSync(localPath)) {
-		codePath = path.join(localPath, codePath);
-	} else if (fs.existsSync(remotePath)) {
-		codePath = path.join(remotePath, codePath);
-	}
-	codeCmd = `"${codePath}"`;
-}
-
 function getPath(arg: string, pwd: string): string | undefined {
 	if (!path.isAbsolute(arg)) {
 		arg = path.join(pwd, arg);
@@ -106,70 +93,111 @@ function getPath(arg: string, pwd: string): string | undefined {
 }
 
 function escapeWinPath(origPath: string) {
-	return origPath.replace(/\\/g,'\\\\');
+	return origPath.replace(/\\/g, '\\\\');
+}
+
+function processCommandInput(data: Buffer) {
+	let [cmd, pwd, arg] = data.toString().trim().split('$$');
+	cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
+	if (arg === "") { return }
+	if (cmd === 'open') {
+		let filename = getPath(arg, pwd);
+		if (!filename) { return }
+		vscode.window.showTextDocument(vscode.Uri.file(filename));
+	} else if (cmd === 'add') {
+		let folder = getPath(arg, pwd);
+		if (!folder) { return }
+		vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, {
+			uri: vscode.Uri.file(folder)
+		});
+		vscode.commands.executeCommand('workbench.view.explorer');
+	} else if (cmd === 'rg') {
+		let [file, linestr, colstr] = arg.split(':');
+		let filename = getPath(file, pwd);
+		if (!filename) { return };
+		let line = parseInt(linestr) - 1;
+		let col = parseInt(colstr) - 1;
+		vscode.window.showTextDocument(vscode.Uri.file(filename)).then((ed) => {
+			ed.selection = new vscode.Selection(line, col, line, col);
+		})
+	}
+}
+
+function listenToFifo(fifo: string) {
+	fs.open(fifo, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK , (err, fd) => {
+		const pipe = new net.Socket({fd: fd, allowHalfOpen: true });
+		pipe.on('data', (data) => {
+			processCommandInput(data);
+		})
+		pipe.on('end', () => {
+			console.log('end!')
+			listenToFifo(fifo);
+		})
+	})
+}
+
+function setupWindowsPipe() {
+	let server = net.createServer((socket) => {
+		socket.on('data', (data) => {
+			processCommandInput(data);
+		})
+	});
+	let idx = 0;
+	while (!fzfPipe) {
+		try {
+			let pipe = `\\\\?\\pipe\\fzf-pipe-${process.pid}`;
+			if (idx > 0) { pipe += `-${idx}`; }
+			server.listen(pipe);
+			fzfPipe = escapeWinPath(pipe);
+		} catch (e) {
+			if (e.code === 'EADDRINUSE') {
+				// Try again for a new address
+				++idx;
+			} else {
+				// Bad news
+				throw e;
+			}
+		}
+	}
+}
+
+function setupPOSIXPipe() {
+	let idx = 0;
+	while (!fzfPipe && idx < 10) {
+		try {
+			let pipe = path.join(os.tmpdir(), `fzf-pipe-${process.pid}`);
+			if (idx > 0) { pipe += `-${idx}`; }
+			cp.execSync(`mkfifo -m 600 ${pipe}`);
+			fzfPipe = pipe;
+		} catch (e) {
+			// Try again for a new address
+			++idx;
+		}
+	}
+	listenToFifo(fzfPipe);
+}
+
+function setupPipesAndListeners() {
+	if (isWindows()) {
+		setupWindowsPipe();
+	} else {
+		setupPOSIXPipe();
+	}
 }
 
 export function activate(context: vscode.ExtensionContext) {
 	applyConfig();
-	if (isWindows()) {
-		let server = net.createServer((socket) => {
-			socket.on('data', (data) => {
-				let [cmd, pwd, arg] = data.toString().trim().split('$$');
-				cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
-				if (arg === "") { return }
-				if (cmd === 'open') {
-					let filename = getPath(arg, pwd);
-					if (!filename) { return }
-					vscode.window.showTextDocument(vscode.Uri.file(filename));
-				} else if (cmd === 'add') {
-					let folder = getPath(arg, pwd);
-					if (!folder) { return }
-					vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, {
-						uri: vscode.Uri.file(folder)
-					});
-					vscode.commands.executeCommand('workbench.view.explorer');
-				} else if (cmd === 'rg') {
-					let [file, linestr, colstr] = arg.split(':');
-					let filename = getPath(file, pwd);
-					if (!filename) { return };
-					let line = parseInt(linestr)-1;
-					let col = parseInt(colstr)-1;
-					vscode.window.showTextDocument(vscode.Uri.file(filename)).then((ed) => {
-						ed.selection = new vscode.Selection(line, col, line, col);
-					})
-				}
-			})
-
-		});
-		let idx = 0;
-		while (!fzfPipe) {
-			try {
-				let pipe = `\\\\?\\pipe\\fzf-pipe-${process.pid}`;
-				if (idx > 0) { pipe += `-${idx}`; }
-				server.listen(pipe);
-				fzfPipe = escapeWinPath(pipe);
-			} catch(e) {
-				if (e.code === 'EADDRINUSE') {
-					// Try again for a new address
-					++idx;
-				} else {
-					// Bad news
-					throw e;
-				}
-			}
-		}
-		fzfPipeBatch = vscode.extensions.getExtension('rlivings39.fzf-quick-open')?.extensionPath ?? "";
-		fzfPipeBatch = escapeWinPath(path.join(fzfPipeBatch, 'scripts', 'topipe.bat'));
-	}
-	setupCodeCmd();
+	setupPipesAndListeners();
+	fzfPipeScript = vscode.extensions.getExtension('rlivings39.fzf-quick-open')?.extensionPath ?? "";
+	fzfPipeScript = escapeWinPath(path.join(fzfPipeScript, 'scripts', 'topipe.' + (isWindows() ? "bat" : "sh")));
 	vscode.workspace.onDidChangeConfiguration((e) => {
 		if (e.affectsConfiguration('fzf-quick-open')) {
 			applyConfig();
 		}
 	})
 
-	let codeOpenFileCmd = `${fzfCmd} | ${fzfPipeBatch} open ${fzfPipe}`;
-	let codeOpenFolderCmd = `${fzfCmd} | ${fzfPipeBatch} add ${fzfPipe}`;
+	let codeOpenFileCmd = `${fzfCmd} | ${fzfPipeScript} open "${fzfPipe}"`;
+	let codeOpenFolderCmd = `${fzfCmd} | ${fzfPipeScript} add "${fzfPipe}"`;
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
@@ -199,7 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		term.sendText(makeSearchCmd(pattern, codeCmd), true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearchPwd', async () => {
@@ -209,7 +237,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		moveToPwd(term);
-		term.sendText(makeSearchCmd(pattern, codeCmd), true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	vscode.window.onDidCloseTerminal((terminal) => {
@@ -249,8 +277,7 @@ async function getSearchText(): Promise<string | undefined> {
 /**
  * Return the command used to invoke rg. Exported to allow unit testing.
  * @param pattern Pattern to search for
- * @param codeCmd Command used to launch code
  */
-export function makeSearchCmd(pattern: string, codeCmd: string): string {
-	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi | ${fzfPipeBatch} rg ${fzfPipe}`;
+export function makeSearchCmd(pattern: string): string {
+	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi | ${fzfPipeScript} rg "${fzfPipe}"`;
 }
