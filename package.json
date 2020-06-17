@@ -64,7 +64,7 @@
         "fzf-quick-open.findDirectoriesCmd": {
           "scope": "window",
           "type": "string",
-          "default": "find -type d",
+          "default": "find . -type d",
           "description": "Command used to find directories with fzf. For best performance install fd and use 'fd --type d'"
         },
         "fzf-quick-open.codeCmd": {

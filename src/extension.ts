@@ -10,12 +10,11 @@ import * as cp from 'child_process';
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
-let codePath: string;
 let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
 let rgCaseFlag: string;
-let fzfPipe: string;
+let fzfPipe: string | undefined;
 let fzfPipeScript: string;
 
 export const TERMINAL_NAME = "fzf terminal";
@@ -176,7 +175,7 @@ function setupPOSIXPipe() {
 			++idx;
 		}
 	}
-	listenToFifo(fzfPipe);
+	listenToFifo(fzfPipe as string);
 }
 
 function setupPipesAndListeners() {
@@ -274,6 +273,13 @@ async function getSearchText(): Promise<string | undefined> {
 		value: value
 	});
 	return pattern;
+}
+
+export function deactivate() {
+	if (!isWindows() && fzfPipe) {
+		fs.unlinkSync(fzfPipe);
+		fzfPipe = undefined;
+	}
 }
 
 /**
