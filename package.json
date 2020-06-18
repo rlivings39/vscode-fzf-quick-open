@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf fuzzy quick open",
   "description": "Fuzzy search files/folders and ripgrep results with fzf inside VSCode",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
@@ -64,13 +64,14 @@
         "fzf-quick-open.findDirectoriesCmd": {
           "scope": "window",
           "type": "string",
-          "default": "find -type d",
+          "default": "find . -type d",
           "description": "Command used to find directories with fzf. For best performance install fd and use 'fd --type d'"
         },
         "fzf-quick-open.codeCmd": {
           "scope": "window",
           "type": "string",
           "default": "code",
+          "deprecationMessage": "DEPRECATED: This option has no utility as of v0.3.0. We avoid use of the code command line API and don't need this to distinguish code from code-insiders. Please report unexpected issues based on the removal of this property.",
           "description": "Command used to launch VSCode. Set to code-insiders if using insiders build"
         },
         "fzf-quick-open.fuzzyCmd": {

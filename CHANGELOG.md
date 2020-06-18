@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] - 2020-06-14
+
+### Changed
+
+- Changed implementation to avoid using command line utilities: `xargs, cut, code`. `fzf` output is now sent through named pipes and processed in the VSCode extension code. This avoids issues with having those utilities installed, having the wrong `code` on the path, and allows for implemeting arbitrary functionality beyond what the `code` command supports.
+
 ## [0.2.12] - 2020-05-26
 
 ### Added
