@@ -131,7 +131,6 @@ function listenToFifo(fifo: string) {
 			processCommandInput(data);
 		})
 		pipe.on('end', () => {
-			console.log('end!')
 			listenToFifo(fifo);
 		})
 	})
