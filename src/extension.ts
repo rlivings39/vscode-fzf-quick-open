@@ -15,6 +15,8 @@ let initialCwd: string;
 let rgCaseFlag: string;
 let fzfPipe: string;
 let fzfPipeBatch: string;
+let windowsNeedsEscape = false;
+let fzfQuote = "'";
 
 export const TERMINAL_NAME = "fzf terminal";
 export const TERMINAL_NAME_PWD = "fzf pwd terminal";
@@ -58,21 +60,19 @@ function moveToPwd(term: vscode.Terminal) {
 	}
 }
 
-function xargsCmd() {
-	if (process.platform === 'darwin') {
-		return 'xargs -0';
-	} else {
-		return 'xargs -0 -r';
-	}
-
-}
-
 function applyConfig() {
 	fzfCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('fuzzyCmd') as string ?? "fzf";
 	findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
 	initialCwd = vscode.workspace.getConfiguration('fzf-quick-open').get('initialWorkingDirectory') as string;
 	let rgopt = vscode.workspace.getConfiguration('fzf-quick-open').get('ripgrepSearchStyle') as string;
 	rgCaseFlag = rgflagmap.get(rgopt) ?? "Case sensitive";
+	if (isWindows()) {
+		let term = vscode.workspace.getConfiguration('terminal.integrated.shell').get('windows') as string;
+		let isWindowsCmd = term.toLowerCase().endsWith("cmd.exe");
+		windowsNeedsEscape = !isWindowsCmd;
+		// CMD doesn't support single quote.
+		fzfQuote = isWindowsCmd ? '"' : "'";
+	}
 }
 
 function isWindows() {
@@ -106,7 +106,35 @@ function getPath(arg: string, pwd: string): string | undefined {
 }
 
 function escapeWinPath(origPath: string) {
-	return origPath.replace(/\\/g,'\\\\');
+	if (isWindows() && windowsNeedsEscape) {
+		return origPath.replace(/\\/g, '\\\\');
+	} else {
+		return origPath;
+	}
+}
+
+function getCodeOpenFileCmd() {
+	return`${fzfCmd} | ${getFzfPipeBatch()} open ${getFzfPipe()}`;
+}
+
+function getCodeOpenFolderCmd() {
+	return `${fzfCmd} | ${getFzfPipeBatch()} add ${getFzfPipe()}`;
+}
+
+function getFindCmd() {
+	return findCmd;
+}
+
+function getFzfPipe() {
+	return escapeWinPath(fzfPipe);
+}
+
+function getFzfPipeBatch() {
+	return escapeWinPath(fzfPipeBatch);
+}
+
+function getQuote() {
+	return fzfQuote;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -132,10 +160,13 @@ export function activate(context: vscode.ExtensionContext) {
 					let [file, linestr, colstr] = arg.split(':');
 					let filename = getPath(file, pwd);
 					if (!filename) { return };
-					let line = parseInt(linestr)-1;
-					let col = parseInt(colstr)-1;
+					let line = parseInt(linestr) - 1;
+					let col = parseInt(colstr) - 1;
 					vscode.window.showTextDocument(vscode.Uri.file(filename)).then((ed) => {
+						// Move cursor
 						ed.selection = new vscode.Selection(line, col, line, col);
+						// Scroll viewport
+						ed.revealRange(new vscode.Range(line, col, line, col), vscode.TextEditorRevealType.InCenterIfOutsideViewport);
 					})
 				}
 			})
@@ -147,8 +178,8 @@ export function activate(context: vscode.ExtensionContext) {
 				let pipe = `\\\\?\\pipe\\fzf-pipe-${process.pid}`;
 				if (idx > 0) { pipe += `-${idx}`; }
 				server.listen(pipe);
-				fzfPipe = escapeWinPath(pipe);
-			} catch(e) {
+				fzfPipe = pipe;
+			} catch (e) {
 				if (e.code === 'EADDRINUSE') {
 					// Try again for a new address
 					++idx;
@@ -159,38 +190,35 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}
 		fzfPipeBatch = vscode.extensions.getExtension('rlivings39.fzf-quick-open')?.extensionPath ?? "";
-		fzfPipeBatch = escapeWinPath(path.join(fzfPipeBatch, 'scripts', 'topipe.bat'));
+		fzfPipeBatch = path.join(fzfPipeBatch, 'scripts', 'topipe.bat');
 	}
 	setupCodeCmd();
 	vscode.workspace.onDidChangeConfiguration((e) => {
-		if (e.affectsConfiguration('fzf-quick-open')) {
+		if (e.affectsConfiguration('fzf-quick-open') || e.affectsConfiguration('terminal.integrated.shell.windows')) {
 			applyConfig();
 		}
 	})
 
-	let codeOpenFileCmd = `${fzfCmd} | ${fzfPipeBatch} open ${fzfPipe}`;
-	let codeOpenFolderCmd = `${fzfCmd} | ${fzfPipeBatch} add ${fzfPipe}`;
-
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFile', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		term.sendText(codeOpenFileCmd, true);
+		term.sendText(getCodeOpenFileCmd(), true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFilePwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		moveToPwd(term);
-		term.sendText(codeOpenFileCmd, true);
+		term.sendText(getCodeOpenFileCmd(), true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolder', () => {
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		term.sendText(`${findCmd} | ${codeOpenFolderCmd}`, true);
+		term.sendText(`${getFindCmd()} | ${getCodeOpenFolderCmd()}`, true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfAddWorkspaceFolderPwd', () => {
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		moveToPwd(term);
-		term.sendText(`${findCmd} | ${codeOpenFolderCmd}`, true);
+		term.sendText(`${getFindCmd()} | ${getCodeOpenFolderCmd()}`, true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearch', async () => {
@@ -199,7 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
-		term.sendText(makeSearchCmd(pattern, codeCmd), true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearchPwd', async () => {
@@ -209,7 +237,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
 		moveToPwd(term);
-		term.sendText(makeSearchCmd(pattern, codeCmd), true);
+		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
 	vscode.window.onDidCloseTerminal((terminal) => {
@@ -249,8 +277,8 @@ async function getSearchText(): Promise<string | undefined> {
 /**
  * Return the command used to invoke rg. Exported to allow unit testing.
  * @param pattern Pattern to search for
- * @param codeCmd Command used to launch code
- */
-export function makeSearchCmd(pattern: string, codeCmd: string): string {
-	return `rg '${pattern}' ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi | ${fzfPipeBatch} rg ${fzfPipe}`;
+  */
+export function makeSearchCmd(pattern: string): string {
+	let q = getQuote();
+	return `rg ${q}${pattern}${q} ${rgCaseFlag} --vimgrep --color ansi | ${fzfCmd} --ansi | ${getFzfPipeBatch()} rg ${getFzfPipe()}`;
 }

@@ -8,7 +8,7 @@ Any time that vscode requires interaction with the OS file dialog, the workflow 
 
 Provides an interface to search using `ripgrep` and browse the results using `fzf`. This is inspired by Vim's `rg` and `fzf` integration. The search pattern defaults to the word under your cursor or your current selection and is easily overridden.
 
-Works on *nix, Mac, and Windows with Git Bash as your shell in VSCode. The extension relies on calling `xargs` and `cut` in the terminal window.
+Works on *nix, Mac, and Windows (tested with CMD and Git Bash). The extension relies on calling `xargs` and `cut` in the terminal window.
 
 # Usage
 Provides the commands:
