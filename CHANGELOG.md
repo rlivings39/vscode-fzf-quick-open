@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - 2020-08-22
+
+### Added
+
+- Full support on Windows with the VSCode shell as Windows CMD or Git Bash
+
 ## [0.3.0] - 2020-06-14
 
 ### Changed
