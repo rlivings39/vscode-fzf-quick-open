@@ -45,9 +45,13 @@ To change the `rg` case matching options use the setting `fzf-quick-open.ripgrep
 1. [Install ripgrep](https://github.com/BurntSushi/ripgrep)
 1. For best performance you should set up `fzf` to use the amazingly fast [fd](https://github.com/sharkdp/fd)
 
+    **`~/.config/fish/config.fish`**
+
     ```fish
     set --universal FZF_DEFAULT_COMMAND 'fd'
     ```
+
+    **`~/.bashrc`**
 
     ```bash
     echo "export FZF_DEFAULT_COMMAND='fd'" >> ~/.bashrc
