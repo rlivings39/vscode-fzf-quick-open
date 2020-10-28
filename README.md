@@ -50,7 +50,7 @@ To change the `rg` case matching options use the setting `fzf-quick-open.ripgrep
     ```
 
     ```bash
-    export FZF_DEFAULT_COMMAND='fd' >> ~/.bashrc
+    echo "export FZF_DEFAULT_COMMAND='fd'" >> ~/.bashrc
     ```
 
 1. Configure the setting `fzf-quick-open.findDirectoriesCmd` to use `fd`: `fd --type d`
