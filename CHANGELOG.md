@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - 2021-04-04
+
+### Changed
+
+- Dependabot and `npm audit fix` fixes
+
 ## [0.4.0] - 2020-08-22
 
 ### Added
