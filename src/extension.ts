@@ -78,7 +78,7 @@ function applyConfig() {
 	rgCaseFlag = rgflagmap.get(rgopt) ?? "Case sensitive";
 	if (isWindows()) {
 		let term = vscode.workspace.getConfiguration('terminal.integrated.shell').get('windows') as string;
-		let isWindowsCmd = term.toLowerCase().endsWith("cmd.exe");
+		let isWindowsCmd = term?.toLowerCase().endsWith("cmd.exe") ?? false;
 		windowsNeedsEscape = !isWindowsCmd;
 		// CMD doesn't support single quote.
 		fzfQuote = isWindowsCmd ? '"' : "'";
