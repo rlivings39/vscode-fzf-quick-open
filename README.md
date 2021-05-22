@@ -39,6 +39,8 @@ To change the `rg` case matching options use the setting `fzf-quick-open.ripgrep
 * Ignore case
 * Smart case
 
+To pass other flags to `rg` add them to `fzf-quick-open.ripgrepOptions`.
+
 # Setup
 
 1. [Install fzf](https://github.com/junegunn/fzf)

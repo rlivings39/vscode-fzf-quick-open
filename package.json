@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf fuzzy quick open",
   "description": "Fuzzy search files/folders and ripgrep results with fzf inside VSCode",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
@@ -96,6 +96,12 @@
           ],
           "default": "Case sensitive",
           "description": "Command used for fuzzy searching program. E.g. fzf, sk"
+        },
+        "fzf-quick-open.ripgrepOptions": {
+          "scope": "window",
+          "type": "string",
+          "default": [],
+          "description": "Options to pass to rg"
         }
       }
     }

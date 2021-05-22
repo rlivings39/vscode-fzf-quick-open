@@ -13,7 +13,7 @@ let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 let findCmd: string;
 let fzfCmd: string;
 let initialCwd: string;
-let rgCaseFlag: string;
+let rgFlags: string;
 let fzfPipe: string | undefined;
 let fzfPipeScript: string;
 let windowsNeedsEscape = false;
@@ -71,11 +71,14 @@ function xargsCmd() {
 }
 
 function applyConfig() {
-	fzfCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('fuzzyCmd') as string ?? "fzf";
-	findCmd = vscode.workspace.getConfiguration('fzf-quick-open').get('findDirectoriesCmd') as string;
-	initialCwd = vscode.workspace.getConfiguration('fzf-quick-open').get('initialWorkingDirectory') as string;
-	let rgopt = vscode.workspace.getConfiguration('fzf-quick-open').get('ripgrepSearchStyle') as string;
-	rgCaseFlag = rgflagmap.get(rgopt) ?? "Case sensitive";
+	let cfg = vscode.workspace.getConfiguration('fzf-quick-open');
+	fzfCmd = cfg.get('fuzzyCmd') as string ?? "fzf";
+	findCmd = cfg.get('findDirectoriesCmd') as string;
+	initialCwd = cfg.get('initialWorkingDirectory') as string;
+	let rgopt = cfg.get('ripgrepSearchStyle') as string;
+	rgFlags = (rgflagmap.get(rgopt) ?? "--case-sensitive") + ' ';
+	rgFlags += cfg.get('ripgrepOptions') as string ?? "";
+	rgFlags = rgFlags.trim();
 	if (isWindows()) {
 		let term = vscode.workspace.getConfiguration('terminal.integrated.shell').get('windows') as string;
 		let isWindowsCmd = term?.toLowerCase().endsWith("cmd.exe") ?? false;
@@ -329,5 +332,5 @@ export function deactivate() {
  */
 export function makeSearchCmd(pattern: string): string {
 	let q = getQuote();
-	return `rg ${q}${pattern}${q} ${rgCaseFlag} --vimgrep --color ansi | ${getFzfCmd()} --ansi | ${getFzfPipeScript()} rg "${getFzfPipe()}"`;
+	return `rg ${q}${pattern}${q} ${rgFlags} --vimgrep --color ansi | ${getFzfCmd()} --ansi | ${getFzfPipeScript()} rg "${getFzfPipe()}"`;
 }

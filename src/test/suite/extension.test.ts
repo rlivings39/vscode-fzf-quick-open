@@ -85,10 +85,13 @@ suite('fzf quick open uninit', async () => {
 	async function verifyRgConfig(opt: fzfQuickOpen.rgoptions, flag: string) {
 		let settings = vscode.workspace.getConfiguration('fzf-quick-open');
 		await settings.update('ripgrepSearchStyle', opt, vscode.ConfigurationTarget.Global);
+		let testFlag = '--a-test-flag --other-test-flag';
+		await settings.update('ripgrepOptions', testFlag, vscode.ConfigurationTarget.Global);
 		let rgcmd = fzfQuickOpen.makeSearchCmd('pattern');
 		let expectedFlag = fzfQuickOpen.rgflagmap.get(opt);
 		expect(rgcmd).contains(expectedFlag);
 		expect(rgcmd).contains(flag);
+		expect(rgcmd).contains(testFlag);
 	}
 
 	// Make sure we respond to configuration changes when computing rg command

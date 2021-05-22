@@ -1,11 +1,16 @@
 # Changelog
 
+## [0.4.3] - 2021-05-22
+
+### Added
+
+- New setting `fzf-quick-open.ripgrepOptions` to supply flags to `rg`
+
 ## [0.4.2] - 2021-04-29
 
 ### Fixed
 
 - Fixed #27 with unset shell on Windows
-
 
 ## [0.4.1] - 2021-04-04
 
