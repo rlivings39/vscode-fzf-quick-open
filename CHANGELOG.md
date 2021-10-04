@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.4] - 2021-10-04
+
+- Fix #35 with terminal profiles on Windows
 ## [0.4.3] - 2021-05-22
 
 ### Added
