@@ -81,6 +81,16 @@ function applyConfig() {
 	rgFlags = rgFlags.trim();
 	if (isWindows()) {
 		let term = vscode.workspace.getConfiguration('terminal.integrated.shell').get('windows') as string;
+
+		// support for new terminal profiles
+		if (!term) {
+			let defaultTerm: string | undefined = vscode.workspace.getConfiguration('terminal.integrated.defaultProfile').get('windows');
+			if (!!defaultTerm) {
+				let profiles: any = vscode.workspace.getConfiguration('terminal.integrated.profiles').get('windows');
+				term = profiles?.[defaultTerm]?.path?.[0];
+			}
+		}
+
 		let isWindowsCmd = term?.toLowerCase().endsWith("cmd.exe") ?? false;
 		windowsNeedsEscape = !isWindowsCmd;
 		// CMD doesn't support single quote.
