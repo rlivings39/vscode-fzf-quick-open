@@ -61,15 +61,6 @@ function moveToPwd(term: vscode.Terminal) {
 	}
 }
 
-function xargsCmd() {
-	if (process.platform === 'darwin') {
-		return 'xargs -0';
-	} else {
-		return 'xargs -0 -r';
-	}
-
-}
-
 function applyConfig() {
 	let cfg = vscode.workspace.getConfiguration('fzf-quick-open');
 	fzfCmd = cfg.get('fuzzyCmd') as string ?? "fzf";
@@ -207,7 +198,7 @@ function setupWindowsPipe() {
 			if (idx > 0) { pipe += `-${idx}`; }
 			server.listen(pipe);
 			fzfPipe = pipe;
-		} catch (e) {
+		} catch (e: any) {
 			if (e.code === 'EADDRINUSE') {
 				// Try again for a new address
 				++idx;
@@ -321,7 +312,8 @@ async function getSearchText(): Promise<string | undefined> {
 		}
 		value = activeRange ? vscode.window.activeTextEditor?.document.getText(activeRange) : undefined
 	}
-
+	// #33: Make default search more useful
+	value = value || ".*";
 	let pattern = await vscode.window.showInputBox({
 		prompt: "Search pattern",
 		value: value

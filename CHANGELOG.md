@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.5] - 2021-11-14
+
+- Fix #33 default search strings
 ## [0.4.4] - 2021-10-04
 
 - Fix #35 with terminal profiles on Windows
