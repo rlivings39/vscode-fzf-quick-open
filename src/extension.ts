@@ -82,7 +82,7 @@ function applyConfig() {
 			}
 		}
 
-		let isWindowsCmd = term?.toLowerCase().endsWith("cmd.exe") ?? false;
+		let isWindowsCmd = (term?.toLowerCase().endsWith("cmd.exe") || term?.toLowerCase().endsWith("powershell.exe")) ?? false;
 		windowsNeedsEscape = !isWindowsCmd;
 		// CMD doesn't support single quote.
 		fzfQuote = isWindowsCmd ? '"' : "'";
