@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.6] - 2022-01-11
+
+### Added
+
+- Support for PowerShell on Windows. Thanks @Kamholtz!
+
 ## [0.4.5] - 2021-11-14
 
 - Fix #33 default search strings
