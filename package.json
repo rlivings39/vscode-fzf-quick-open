@@ -24,7 +24,8 @@
     "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder",
     "onCommand:fzf-quick-open.runFzfAddWorkspaceFolderPwd",
     "onCommand:fzf-quick-open.runFzfSearch",
-    "onCommand:fzf-quick-open.runFzfSearchPwd"
+    "onCommand:fzf-quick-open.runFzfSearchPwd",
+    "onCommand:fzf-quick-open.runFzfSearchProjectRoot"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -56,6 +57,10 @@
       {
         "command": "fzf-quick-open.runFzfSearchPwd",
         "title": "fzf: Search in PWD using rg and fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfSearchProjectRoot",
+        "title": "fzf: Search in Project Root (.git) using rg and fzf"
       }
     ],
     "configuration": {

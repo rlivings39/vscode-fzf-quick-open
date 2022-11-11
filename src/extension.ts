@@ -299,6 +299,20 @@ export function activate(context: vscode.ExtensionContext) {
 		term.sendText(makeSearchCmd(pattern), true);
 	}));
 
+	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfSearchProjectRoot', async () => {
+		let pattern = await getSearchText();
+		if (pattern === undefined) {
+			return;
+		}
+		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminalPwd);
+		moveToPwd(term);
+		if (isWindows()) {
+			term.sendText(`${gitTopLevelDirectoryCmd_Win32} && ${makeSearchCmd(pattern)}`, true);
+		} else {
+			term.sendText(`${gitTopLevelDirectoryCmd_Unix} && ${makeSearchCmd(pattern)}`, true);
+		}
+	}));
+
 	vscode.window.onDidCloseTerminal((terminal) => {
 		switch (terminal.name) {
 			case TERMINAL_NAME:
