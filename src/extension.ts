@@ -12,6 +12,7 @@ let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
 
 let findCmd: string;
 let fzfCmd: string;
+let fzfSearchCmd: string;
 let initialCwd: string;
 let rgFlags: string;
 let fzfPipe: string | undefined;
@@ -67,6 +68,7 @@ function moveToPwd(term: vscode.Terminal) {
 function applyConfig() {
 	let cfg = vscode.workspace.getConfiguration('fzf-quick-open');
 	fzfCmd = cfg.get('fuzzyCmd') as string ?? "fzf";
+	fzfSearchCmd = cfg.get('fuzzySearchCmd') as string ?? "fzf";
 	findCmd = cfg.get('findDirectoriesCmd') as string;
 	initialCwd = cfg.get('initialWorkingDirectory') as string;
 	let rgopt = cfg.get('ripgrepSearchStyle') as string;
@@ -117,6 +119,10 @@ function escapeWinPath(origPath: string) {
 
 function getFzfCmd() {
 	return fzfCmd;
+}
+
+function getFzfFuzzyCmd() {
+	return fzfSearchCmd;
 }
 
 function getCodeOpenFileCmd() {
@@ -361,5 +367,5 @@ export function deactivate() {
  */
 export function makeSearchCmd(pattern: string): string {
 	let q = getQuote();
-	return `rg ${q}${pattern}${q} ${rgFlags} --vimgrep --color ansi | ${getFzfCmd()} --ansi | ${getFzfPipeScript()} rg "${getFzfPipe()}"`;
+	return `rg ${q}${pattern}${q} ${rgFlags} --vimgrep --color ansi | ${getFzfFuzzyCmd()} | ${getFzfPipeScript()} rg "${getFzfPipe()}"`;
 }

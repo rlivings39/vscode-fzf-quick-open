@@ -91,6 +91,12 @@
           "default": "fzf",
           "description": "Command used for fuzzy searching program. E.g. fzf, sk"
         },
+        "fzf-quick-open.fuzzySearchCmd": {
+          "scope": "window",
+          "type": "string",
+          "default": "fzf",
+          "description": "Command used for fuzzy searching program with the ripgrep commands. E.g. fzf, sk"
+        },
         "fzf-quick-open.ripgrepSearchStyle": {
           "scope": "window",
           "type": "string",
