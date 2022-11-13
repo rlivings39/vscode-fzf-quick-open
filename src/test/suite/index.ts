@@ -28,7 +28,7 @@ export async function run(): Promise<void> {
 		ui: 'tdd',
 		timeout: 4000
 	});
-	mocha.useColors(true);
+	mocha.options.color = true;
 
 	const testsRoot = path.resolve(__dirname, '..');
 
