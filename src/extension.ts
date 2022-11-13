@@ -260,7 +260,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('fzf-quick-open.runFzfFileProjectRoot', () => {
-		let term = showFzfTerminal(TERMINAL_NAME, fzfTerminal);
+		let term = showFzfTerminal(TERMINAL_NAME_PWD, fzfTerminal);
 		moveToPwd(term);
 		if (isWindows()) {
 			term.sendText(`${gitTopLevelDirectoryCmd_Win32} && ${getCodeOpenFileCmd()}`, true);

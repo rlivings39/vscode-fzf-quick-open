@@ -2,7 +2,7 @@
   "name": "fzf-quick-open",
   "displayName": "fzf fuzzy quick open",
   "description": "Fuzzy search files/folders and ripgrep results with fzf inside VSCode",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "author": "Ryan Livingston",
   "license": "MIT",
   "repository": {
