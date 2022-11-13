@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0] - 2022-11-13
+
+### Added
+
+- New commands to search in the current file's root folder anchored by .git. Thanks to @clearfeld for this!
+- Updated some dependencies like mocha
+
 ## [0.4.6] - 2022-01-11
 
 ### Added
