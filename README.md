@@ -25,6 +25,13 @@ On terminal launch, the `pwd` is chosen based on the active editor file. Also ad
 
 which are the same as above but switches to parent directory of active file on every invocation.
 
+On terminal launch, the `Project Root (.git)` is opened based on the results of `git rev-parse --show-toplevel` on the active editor file. Also adds
+
+* `fzf: Search in Project Root (.git) using rg and fzf`
+* `fzf: Open file in Project Root (.git) using fzf`
+
+which are the same as the above but switches to project root directory of the active file on every invocation.
+
 Bind the commands to keyboard shortcuts to launch faster.
 
 ## Configuration

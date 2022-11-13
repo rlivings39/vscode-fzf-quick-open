@@ -20,10 +20,12 @@
   "activationEvents": [
     "onCommand:fzf-quick-open.runFzfFile",
     "onCommand:fzf-quick-open.runFzfFilePwd",
+    "onCommand:fzf-quick-open.runFzfFileProjectRoot",
     "onCommand:fzf-quick-open.runFzfAddWorkspaceFolder",
     "onCommand:fzf-quick-open.runFzfAddWorkspaceFolderPwd",
     "onCommand:fzf-quick-open.runFzfSearch",
-    "onCommand:fzf-quick-open.runFzfSearchPwd"
+    "onCommand:fzf-quick-open.runFzfSearchPwd",
+    "onCommand:fzf-quick-open.runFzfSearchProjectRoot"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -35,6 +37,10 @@
       {
         "command": "fzf-quick-open.runFzfFilePwd",
         "title": "fzf: Open file in PWD using fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfFileProjectRoot",
+        "title": "fzf: Open file in Project Root (.git) using fzf"
       },
       {
         "command": "fzf-quick-open.runFzfAddWorkspaceFolder",
@@ -51,6 +57,10 @@
       {
         "command": "fzf-quick-open.runFzfSearchPwd",
         "title": "fzf: Search in PWD using rg and fzf"
+      },
+      {
+        "command": "fzf-quick-open.runFzfSearchProjectRoot",
+        "title": "fzf: Search in Project Root (.git) using rg and fzf"
       }
     ],
     "configuration": {
