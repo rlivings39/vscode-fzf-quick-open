@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/rlivings39/vscode-fzf-quick-open.svg?branch=master)](https://travis-ci.com/rlivings39/vscode-fzf-quick-open)
-[![Marketplace](https://vsmarketplacebadge.apphb.com/version-short/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open)
-[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open)
-[![Rating](https://vsmarketplacebadge.apphb.com/rating-short/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open&ssr=false#review-details)
+[![Marketplace](https://img.shields.io/visual-studio-marketplace/v/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/rlivings39.fzf-quick-open.svg)](https://marketplace.visualstudio.com/items?itemName=rlivings39.fzf-quick-open&ssr=false#review-details)
 
 # fzf-based fuzzy searching in VScode to open files/folders and filter ripgrep results
 Any time that vscode requires interaction with the OS file dialog, the workflow can become much less efficient. This comes up when opening files outside of your workspace folders or adding a workspace folder. This extension solves that by providing these actions using [fzf](https://github.com/junegunn/fzf).
