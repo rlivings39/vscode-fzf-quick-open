@@ -74,7 +74,8 @@ function applyConfig() {
 	rgFlags += cfg.get('ripgrepOptions') as string ?? "";
 	rgFlags = rgFlags.trim();
 	if (isWindows()) {
-		let term = vscode.workspace.getConfiguration('terminal.integrated.shell').get('windows') as string;
+		// Issue #52. Use automation profile
+		let term = vscode.workspace.getConfiguration('terminal.integrated.automationProfile').get("windows") as string;
 
 		// support for new terminal profiles
 		if (!term) {
@@ -243,7 +244,7 @@ export function activate(context: vscode.ExtensionContext) {
 	fzfPipeScript = vscode.extensions.getExtension('rlivings39.fzf-quick-open')?.extensionPath ?? "";
 	fzfPipeScript = path.join(fzfPipeScript, 'scripts', 'topipe.' + (isWindows() ? "bat" : "sh"));
 	vscode.workspace.onDidChangeConfiguration((e) => {
-		if (e.affectsConfiguration('fzf-quick-open')  || e.affectsConfiguration('terminal.integrated.shell.windows')) {
+		if (e.affectsConfiguration('fzf-quick-open')  || e.affectsConfiguration('terminal.integrated.automationProfile.windows')) {
 			applyConfig();
 		}
 	})
