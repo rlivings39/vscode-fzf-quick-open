@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as net from 'net';
 import * as os from 'os';
 import * as cp from 'child_process';
+import {Buffer} from "node:buffer";
 
 let fzfTerminal: vscode.Terminal | undefined = undefined;
 let fzfTerminalPwd: vscode.Terminal | undefined = undefined;
@@ -148,7 +149,7 @@ function getQuote() {
 	return fzfQuote;
 }
 
-function processCommandInput(data: Buffer) {
+function processCommandInput(data: string | Buffer) {
 	let [cmd, pwd, arg] = data.toString().trim().split('$$');
 	cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
 	if (arg === "") { return }

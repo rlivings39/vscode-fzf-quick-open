@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as Mocha from 'mocha';
-import * as glob from 'glob';
+import {glob} from 'glob';
+//import * as glob from 'glob';
 import { join } from 'path';
 import * as process from 'process';
 
@@ -33,11 +34,15 @@ export async function run(): Promise<void> {
 	const testsRoot = path.resolve(__dirname, '..');
 
 	return new Promise((c, e) => {
-		glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
+		glob('**/**.test.js', { cwd: testsRoot }).catch(err => {
 			if (err) {
 				return e(err);
 			}
-
+		}).then(files=>{
+			if (files === undefined) {
+				e(new Error('No test files found'));
+				return
+			}
 			// Add files to the test suite
 			files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
