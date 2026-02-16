@@ -1,5 +1,5 @@
 #! /usr/bin/env sh
-# USAGE: topipe.bat commandString pipename
+# USAGE: topipe.sh commandString pipename
 # reads input to send to pipename from input pipe
 sep='$$'
 read arg

@@ -19,6 +19,7 @@ let fzfPipe: string | undefined;
 let fzfPipeScript: string;
 let windowsNeedsEscape = false;
 let fzfQuote = "'";
+let fzfAutoCloseTerm = false;
 
 const gitTopLevelDirectoryCmd_Win32 = "for /f %a in ('git rev-parse --show-toplevel') do cd %a";
 const gitTopLevelDirectoryCmd_Unix = "cd $(git rev-parse --show-toplevel)";
@@ -74,6 +75,7 @@ function applyConfig() {
 	rgFlags = (rgflagmap.get(rgopt) ?? "--case-sensitive") + ' ';
 	rgFlags += cfg.get('ripgrepOptions') as string ?? "";
 	rgFlags = rgFlags.trim();
+	fzfAutoCloseTerm = cfg.get('autoCloseFzfTerminal') ?? false;
 	if (isWindows()) {
 		// Issue #52. Use automation profile
 		let term = vscode.workspace.getConfiguration('terminal.integrated.automationProfile').get("windows") as string;
@@ -149,7 +151,21 @@ function getQuote() {
 	return fzfQuote;
 }
 
+function autoCloseTerminals() {
+	if (fzfAutoCloseTerm) {
+		vscode.window.terminals.find((term) => { return term.name === TERMINAL_NAME; })?.dispose();
+		vscode.window.terminals.find((term) => { return term.name === TERMINAL_NAME_PWD; })?.dispose();
+	}
+}
+
 function processCommandInput(data: string | Buffer) {
+	try {
+		processCommandInputImpl(data);
+	} finally  {
+		autoCloseTerminals();
+	}
+}
+function processCommandInputImpl(data: string | Buffer) {
 	let [cmd, pwd, arg] = data.toString().trim().split('$$');
 	cmd = cmd.trim(); pwd = pwd.trim(); arg = arg.trim();
 	if (arg === "") { return }

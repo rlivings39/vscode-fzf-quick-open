@@ -112,6 +112,12 @@
           "type": "string",
           "default": [],
           "description": "Options to pass to rg"
+        },
+        "fzf-quick-open.autoCloseFzfTerminal": {
+          "scope": "window",
+          "type": "boolean",
+          "default": "false",
+          "description": "Control if the extension should automatically close the FZF terminal window after an operation completes or is cancelled"
         }
       }
     }
